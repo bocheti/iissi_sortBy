@@ -49,6 +49,7 @@ const create = async function (req, res) {
 
 const show = async function (req, res) {
   // Only returns PUBLIC information of restaurants
+  // const list = ['order', 'name', 'description', 'price', 'restaurantId', 'productCategoryId']
   try {
     const restaurant = await Restaurant.findByPk(req.params.restaurantId, {
       attributes: { exclude: ['userId'] },
@@ -60,10 +61,10 @@ const show = async function (req, res) {
       {
         model: RestaurantCategory,
         as: 'restaurantCategory'
-      }],
-      order: [[{ model: Product, as: 'products' }, 'order', 'ASC']]
+      }]
     }
     )
+    restaurant.products.sort((a, b) => restaurant.sortBy === 0 ? a.order - b.order : restaurant.sortBy === 1 ? a.name - b.name : restaurant.sortBy === 2 ? a.description - b.description : restaurant.sortBy === 3 ? a.price - b.price : restaurant.sortBy === 4 ? a.restaurantId - b.restaurantId : a.productCategoryId - b.productCategoryId)
     res.json(restaurant)
   } catch (err) {
     res.status(500).send(err)
@@ -95,12 +96,24 @@ const destroy = async function (req, res) {
   }
 }
 
+const toggleSort = async function (req, res) {
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.restaurantId)
+    restaurant.sortBy = restaurant.sortBy === 5 ? 0 : restaurant.sortBy + 1
+    restaurant.save()
+    res.json(restaurant)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
 const RestaurantController = {
   index,
   indexOwner,
   create,
   show,
   update,
-  destroy
+  destroy,
+  toggleSort
 }
 export default RestaurantController

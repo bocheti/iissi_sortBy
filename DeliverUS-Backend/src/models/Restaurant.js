@@ -76,6 +76,11 @@ const loadModel = (sequelize, DataTypes) => {
       allowNull: false,
       type: DataTypes.DATE,
       defaultValue: new Date()
+    },
+    sortBy: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      defaultValue: 0
     }
   }, {
     sequelize,
